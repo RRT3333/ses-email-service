@@ -25,42 +25,38 @@ jobs:
         id: deploy
         run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       
-      - name: Notify Slack on success
+      - name: Send Slack notification (Success)
         if: success()
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          payload: |
-            {
-              "text": "🚀 Deployment Successful",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*🚀 SES Email Service Deployment Successful*\n*Branch:* ${{ github.ref_name }}\n*Commit:* <${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\n*Author:* ${{ github.actor }}"
-                  }
-                }
-              ]
-            }
+        uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: "🚀 SES Email Service 배포 성공"
+          SLACK_MESSAGE: |
+            📋 배포 정보:
+            • Branch: `${{ github.ref_name }}`
+            • Commit: `${{ github.sha }}`
+            • Message: ${{ github.event.head_commit.message }}
+            • Actor: `${{ github.actor }}`
+            • Workflow: `${{ github.workflow }}`
+            
+            🟢 서비스가 정상적으로 배포되었습니다!
+          SLACK_COLOR: "#36a64f"
+          SLACK_FOOTER: "GitHub Actions"
       
-      - name: Notify Slack on failure
+      - name: Send Slack notification (Failure)
         if: failure()
-        uses: slackapi/slack-github-action@v1.26.0
-        with:
-          payload: |
-            {
-              "text": "❌ Deployment Failed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*❌ SES Email Service Deployment Failed*\n*Branch:* ${{ github.ref_name }}\n*Commit:* <${{ github.event.head_commit.url }}|${{ github.event.head_commit.message }}>\n*Author:* ${{ github.actor }}\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>"
-                  }
-                }
-              ]
-            }
+        uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_TITLE: "❌ SES Email Service 배포 실패"
+          SLACK_MESSAGE: |
+            📋 배포 정보:
+            • Branch: `${{ github.ref_name }}`
+            • Commit: `${{ github.sha }}`
+            • Message: ${{ github.event.head_commit.message }}
+            • Actor: `${{ github.actor }}`
+            • Workflow: `${{ github.workflow }}`
+            
+            🔗 로그 확인: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SLACK_COLOR: "#ff0000"
+          SLACK_FOOTER: "GitHub Actions"
