@@ -12,7 +12,7 @@ Parameters:
 
 Globals:
   Function:
-    Runtime: python3.13
+    Runtime: python3.12
     Architectures:
       - arm64
     EphemeralStorage:
@@ -74,6 +74,7 @@ Resources:
     Properties:
       QueueName: !Sub "${Environment}-email-dlq"
       SqsManagedSseEnabled: true
+      MessageRetentionPeriod: 1209600
 
   # ===== Bounce Handler =====
   BounceHandlerFunction:
