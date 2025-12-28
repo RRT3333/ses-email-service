@@ -1,11 +1,13 @@
 import boto3
 import json
 import logging
+import os
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-ses = boto3.client('ses', region_name='us-west-2')
+ses = boto3.client('ses')
+CONFIG_SET_NAME = os.environ.get('SES_CONFIG_SET_NAME', 'my-first-configuration-set')
 
 def lambda_handler(event, context):
     for record in event['Records']:
@@ -22,7 +24,7 @@ def lambda_handler(event, context):
                         'Html': {'Data': message['body'], 'Charset': 'UTF-8'}
                     }
                 },
-                ConfigurationSetName='my-first-configuration-set',
+                ConfigurationSetName=CONFIG_SET_NAME,
                 Tags=[
                     {'Name': 'email_id', 'Value': str(message['email_id'])}  # ← 추가
                 ]

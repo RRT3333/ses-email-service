@@ -65,6 +65,7 @@ Resources:
       QueueName: !Sub "${Environment}-email-queue"
       SqsManagedSseEnabled: true
       VisibilityTimeout: 60
+      MessageRetentionPeriod: 345600
       RedrivePolicy:
         deadLetterTargetArn: !GetAtt EmailDLQ.Arn
         maxReceiveCount: 3
@@ -109,11 +110,46 @@ Resources:
       TopicName: !Sub "${Environment}-ses-events"
       KmsMasterKeyId: !Ref SesEventTopicKey
 
+  SesEventTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref SesEventTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSESPublish
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref SesEventTopic
+            Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref AWS::AccountId
+
   SesEventTopicKey:
     Type: AWS::KMS::Key
     Properties:
       Description: !Sub "KMS key for ${Environment} SES event topic"
       EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowRoot
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: kms:*
+            Resource: '*'
+          - Sid: AllowSES
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action:
+              - kms:GenerateDataKey*
+              - kms:Decrypt
+            Resource: '*'
 
 Outputs:
   EmailQueueUrl:
