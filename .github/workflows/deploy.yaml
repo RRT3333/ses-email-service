@@ -1,8 +1,9 @@
 name: Lambda_Deploy
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:  # 수동 실행만 가능
+  # push:
+  #   branches: [main]
 
 jobs:
   deploy:
