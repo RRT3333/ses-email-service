@@ -136,7 +136,7 @@ ses-email-service/
 
 ### Prerequisites
 
-- [AWS CLI](https://aws.amazon.com/ko/cli/) configured
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) configured
 - [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed
 - SES domain verified
 
