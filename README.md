@@ -132,6 +132,32 @@ ses-email-service/
 | 최대 재시도 | 3회 | DLQ 이동 전 재시도 횟수 |
 | Visibility Timeout | 60초 | Lambda timeout × 6 |
 
+## Setup
+
+### Windows 환경 개발자
+
+자세한 설정 가이드는 [SETUP_WINDOWS.md](SETUP_WINDOWS.md)를 참고하세요.
+
+**빠른 시작:**
+```powershell
+# 1. Python 3.12 설치 (pyenv-win)
+pyenv install 3.12.0
+pyenv local 3.12.0
+
+# 2. 가상환경 생성
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+
+# 3. 의존성 설치
+pip install --upgrade pip
+pip install -r requirements.txt
+pip install -r requirements-dev.txt  # 개발/테스트용
+
+# 4. 환경 변수 설정
+Copy-Item .env.example .env
+code .env  # 이메일 주소 설정
+```
+
 ## Deployment
 
 ### Prerequisites
@@ -139,6 +165,7 @@ ses-email-service/
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) configured
 - [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) installed
 - SES domain verified
+- Python 3.12
 
 ### Deploy
 
@@ -148,6 +175,38 @@ sam deploy --guided
 ```
 
 ## Test
+
+### 환경 설정
+
+```bash
+# 1. 의존성 설치
+pip install -r requirements.txt
+
+# 2. 환경 변수 파일 생성
+cp .env.example .env
+
+# 3. .env 파일 편집
+# - TEST_FROM_EMAIL: SES 인증된 발신자 이메일
+# - TEST_TO_EMAIL: 수신자 이메일
+# - SQS_QUEUE_URL: sam deploy 후 확인
+```
+
+### 테스트 메시지 전송
+
+```bash
+# 정상 발송
+python email_test/send_test_message.py --type normal
+
+# 필수 필드 누락 (즉시 삭제, DLQ 안감)
+python email_test/send_test_message.py --type missing-email-id
+python email_test/send_test_message.py --type missing-from
+
+# 미인증 이메일 (MessageRejected, DLQ 안감)
+python email_test/send_test_message.py --type unverified-email
+
+# Dry-run 모드
+python email_test/send_test_message.py --type normal --dry-run
+```
 
 ### SQS Message Format
 

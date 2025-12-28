@@ -1,0 +1,5 @@
+# 이 파일은 deprecated되었습니다.
+# 대신 프로젝트 루트의 requirements-dev.txt를 사용하세요:
+# pip install -r requirements-dev.txt
+
+-r ../requirements-dev.txt

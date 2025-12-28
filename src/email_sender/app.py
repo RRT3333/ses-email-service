@@ -14,7 +14,7 @@ def lambda_handler(event, context):
         message = json.loads(record['body'])
         try:
             response = ses.send_email(
-                Source=message['from'],
+                Source=message['from'],  # 웹서버에서 전달한 verified 주소 사용
                 Destination={
                     'ToAddresses': [message['to']]
                 },

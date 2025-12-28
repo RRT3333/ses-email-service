@@ -1,6 +1,11 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python
 
+# 가상환경
+venv/
+.venv/
+env/
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
