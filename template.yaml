@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Email Service
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+  SesConfigSetName:
+    Type: String
+    Default: my-first-configuration-set
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    EphemeralStorage:
+      Size: 512
+    RecursiveLoop: Terminate
+
+Resources:
+  # ===== Email Sender =====
+  EmailSenderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-email-sender"
+      CodeUri: src/email_sender/
+      Handler: app.lambda_handler
+      Description: SQS에서 메시지 받아 SES로 이메일 발송
+      MemorySize: 128
+      Timeout: 10
+      ReservedConcurrentExecutions: 10
+      Environment:
+        Variables:
+          SES_CONFIG_SET_NAME: !Ref SesConfigSetName
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      Policies:
+        - Statement:
+            - Sid: SQSPermissions
+              Effect: Allow
+              Action:
+                - sqs:ReceiveMessage
+                - sqs:DeleteMessage
+                - sqs:GetQueueAttributes
+              Resource: !GetAtt EmailQueue.Arn
+            - Sid: SESPermissions
+              Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: '*'
+      Events:
+        SQS1:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt EmailQueue.Arn
+            BatchSize: 1
+
+  EmailQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${Environment}-email-queue"
+      SqsManagedSseEnabled: true
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EmailDLQ.Arn
+        maxReceiveCount: 3
+
+  EmailDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${Environment}-email-dlq"
+      SqsManagedSseEnabled: true
+
+  # ===== Bounce Handler =====
+  BounceHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-bounce-handler"
+      CodeUri: src/bounce_handler/
+      Handler: app.lambda_handler
+      Description: SES Bounce/Complaint/Delivery 이벤트 처리
+      MemorySize: 128
+      Timeout: 3
+      EventInvokeConfig:
+        MaximumEventAgeInSeconds: 21600
+        MaximumRetryAttempts: 2
+      Policies:
+        - Statement:
+            - Sid: SNSPermissions
+              Effect: Allow
+              Action:
+                - sns:GetTopicAttributes
+                - sns:Subscribe
+              Resource: !Ref SesEventTopic
+      Events:
+        SNS1:
+          Type: SNS
+          Properties:
+            Topic: !Ref SesEventTopic
+
+  SesEventTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Environment}-ses-events"
+      KmsMasterKeyId: !Ref SesEventTopicKey
+
+  SesEventTopicKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub "KMS key for ${Environment} SES event topic"
+      EnableKeyRotation: true
+
+Outputs:
+  EmailQueueUrl:
+    Description: SQS Queue URL for sending emails
+    Value: !Ref EmailQueue
+  
+  EmailQueueArn:
+    Description: SQS Queue ARN
+    Value: !GetAtt EmailQueue.Arn
+  
+  SesEventTopicArn:
+    Description: SNS Topic ARN for SES events
+    Value: !Ref SesEventTopic
+  
+  EmailSenderFunctionArn:
+    Value: !GetAtt EmailSenderFunction.Arn
+  
+  BounceHandlerFunctionArn:
+    Value: !GetAtt BounceHandlerFunction.Arn
