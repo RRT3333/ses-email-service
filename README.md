@@ -132,32 +132,6 @@ ses-email-service/
 | 최대 재시도 | 3회 | DLQ 이동 전 재시도 횟수 |
 | Visibility Timeout | 60초 | Lambda timeout × 6 |
 
-## Setup
-
-### Windows 환경 개발자
-
-자세한 설정 가이드는 [SETUP_WINDOWS.md](SETUP_WINDOWS.md)를 참고하세요.
-
-**빠른 시작:**
-```powershell
-# 1. Python 3.12 설치 (pyenv-win)
-pyenv install 3.12.0
-pyenv local 3.12.0
-
-# 2. 가상환경 생성
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# 3. 의존성 설치
-pip install --upgrade pip
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # 개발/테스트용
-
-# 4. 환경 변수 설정
-Copy-Item .env.example .env
-code .env  # 이메일 주소 설정
-```
-
 ## Deployment
 
 ### Prerequisites
