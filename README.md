@@ -22,8 +22,8 @@
 
 ```mermaid
 graph TD
-    subgraph "Django Application"
-        A[Django Web Server]
+    subgraph "WAS"
+        A[Web Server]
     end
 
     subgraph "Message Queue"
@@ -102,7 +102,7 @@ ses-email-service/
 ## 주요 흐름
 
 ### 이메일 발송
-1. Django에서 이메일 발송 요청을 SQS에 등록
+1. 웹서버 에서 이메일 발송 요청을 SQS에 등록
 2. Lambda(email-sender)가 SQS 메시지를 받아 SES로 발송
 3. 실패 시 최대 3회 재시도 후 DLQ로 이동
 

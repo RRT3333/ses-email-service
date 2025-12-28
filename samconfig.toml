@@ -1,13 +1,13 @@
 version = 0.1
 
 [default.deploy.parameters]
-stack_name = "email-servcice-dev"
+stack_name = "email-service-dev"
 region = "us-west-2"
 confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
 parameter_overrides = "Environment=\"dev\" SesConfigSetName=\"my-first-configuration-set\""
 resolve_s3 = true
-s3_prefix = "email-servcice-dev"
+s3_prefix = "email-service-dev"
 image_repositories = []
 
 [default.global.parameters]

@@ -27,7 +27,7 @@ Resources:
       FunctionName: !Sub "${Environment}-email-sender"
       CodeUri: src/email_sender/
       Handler: app.lambda_handler
-      Description: SQS에서 메시지 받아 SES로 이메일 발송
+      Description: Receives messages from SQS and sends emails via SES
       MemorySize: 128
       Timeout: 10
       ReservedConcurrentExecutions: 10
@@ -101,7 +101,7 @@ Resources:
       FunctionName: !Sub "${Environment}-bounce-handler"
       CodeUri: src/bounce_handler/
       Handler: app.lambda_handler
-      Description: SES Bounce/Complaint/Delivery 이벤트 처리
+      Description: Handles SES Bounce/Complaint/Delivery events
       MemorySize: 128
       Timeout: 3
       EventInvokeConfig:
