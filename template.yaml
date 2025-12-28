@@ -108,7 +108,6 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Sub "${Environment}-ses-events"
-      KmsMasterKeyId: !Ref SesEventTopicKey
 
   SesEventTopicPolicy:
     Type: AWS::SNS::TopicPolicy
@@ -127,29 +126,6 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceAccount: !Ref AWS::AccountId
-
-  SesEventTopicKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Description: !Sub "KMS key for ${Environment} SES event topic"
-      EnableKeyRotation: true
-      KeyPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowRoot
-            Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
-            Action: kms:*
-            Resource: '*'
-          - Sid: AllowSES
-            Effect: Allow
-            Principal:
-              Service: ses.amazonaws.com
-            Action:
-              - kms:GenerateDataKey*
-              - kms:Decrypt
-            Resource: '*'
 
 Outputs:
   EmailQueueUrl:
