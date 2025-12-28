@@ -19,6 +19,7 @@
 이를 해결하기 위해 SQS + Lambda 기반의 비동기 이메일 발송 시스템을 구축함.
 
 ## Architecture
+<img width="1970" height="973" alt="image" src="https://github.com/user-attachments/assets/73bee12a-2b34-4826-bfaa-6b49e3188d12" />
 
 ```mermaid
 graph TD
