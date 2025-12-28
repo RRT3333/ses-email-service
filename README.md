@@ -10,7 +10,8 @@
 > 서버리스 기반 비동기 이메일 발송 시스템
 
 ## 배경
-
+<img width="1970" height="973" alt="image" src="https://github.com/user-attachments/assets/73bee12a-2b34-4826-bfaa-6b49e3188d12" />
+Cold Mail 대량발송 솔루션을 제작하던 중 AWS SES API를 웹서버 에서 직접 호출하는 방식으로 구현하였더니 다음과 같은 문제점이 발생하였음.
 - **SES Rate Limit**: 초당 14개 발송 한도로 인한 Throttling 에러
 - **동기 처리 지연**: 대량 발송 시 사용자 응답 대기 시간 증가
 - **실패 처리 부재**: 발송 실패 시 재시도 로직 없음
@@ -19,8 +20,6 @@
 이를 해결하기 위해 SQS + Lambda 기반의 비동기 이메일 발송 시스템을 구축함.
 
 ## Architecture
-<img width="1970" height="973" alt="image" src="https://github.com/user-attachments/assets/73bee12a-2b34-4826-bfaa-6b49e3188d12" />
-
 ```mermaid
 graph TD
     subgraph "WAS"
