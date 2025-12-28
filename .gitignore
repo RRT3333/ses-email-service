@@ -9,7 +9,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+email_test/
 # Distribution / packaging
 .Python
 build/
